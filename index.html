@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Health Monitor</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="title-group">
+                <h1>🎀 Health Tracker</h1>
+                <div class="status-badge" id="statusBadge">Status: Terputus 🐾</div>
+            </div>
+            <div class="button-group">
+                <button id="btnConnect" class="btn btn-ble">📍 Connect BLE</button>
+                <button id="btnSimulasi" class="btn btn-sim">🪄 Mode Simulasi</button>
+            </div>
+        </header>
+
+        <main class="form-section">
+            <div class="input-wrapper">
+                <div class="input-row">
+                    <label for="inputNama">👤 Nama:</label>
+                    <input type="text" id="inputNama" placeholder="Masukkan nama kamu...">
+                </div>
+                <div class="input-row">
+                    <label for="inputHR">💓 Heart Rate:</label>
+                    <input type="text" id="inputHR" placeholder="Waiting data..." readonly>
+                </div>
+                <div class="input-row">
+                    <label for="inputSuhu">🌡️ Suhu Body:</label>
+                    <input type="text" id="inputSuhu" placeholder="Waiting data..." readonly>
+                </div>
+            </div>
+            <button id="btnSave" class="btn-save">🍀<br>Save</button>
+        </main>
+
+        <section class="table-section">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>H.R (bpm)</th>
+                        <th>Temperature (°C)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data akan muncul di sini -->
+                </tbody>
+            </table>
+        </section>
+
+        <footer>
+            <button id="btnDownload" class="btn btn-csv">📥 Download Data (CSV)</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
