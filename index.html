@@ -4,8 +4,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cute Health Monitor</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS (Tampilan & Desain) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background-color: #fdf6f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 750px;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(214, 130, 130, 0.12);
+            border: 2px solid #fce8e8;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #d66868;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background-color: #f4f4f6;
+            color: #666;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-badge.connected {
+            background-color: #e3f7e8;
+            color: #2e8540;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn-ble {
+            background-color: #dbe4f0;
+            color: #4a5d75;
+        }
+
+        .btn-sim {
+            background-color: #f5d6b8;
+            color: #8c5828;
+        }
+
+        .form-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-row label {
+            width: 125px;
+            font-weight: 700;
+            color: #b56576;
+            font-size: 0.95rem;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1.5px solid #e5d4d8;
+            border-radius: 14px;
+            background-color: #faf7f8;
+            font-size: 0.95rem;
+            color: #444;
+            outline: none;
+        }
+
+        .input-row input:focus {
+            border-color: #d66868;
+            background-color: #fff;
+        }
+
+        .btn-save {
+            background-color: #c8e6c9;
+            color: #388e3c;
+            border: none;
+            border-radius: 18px;
+            padding: 18px 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            line-height: 1.4;
+        }
+
+        .btn-save:hover {
+            background-color: #b4deb6;
+            transform: scale(1.03);
+        }
+
+        .table-section {
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        thead {
+            background-color: #f9db9f;
+            color: #7d5a18;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fffaf0;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f2e8d5;
+            color: #555;
+        }
+
+        footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-csv {
+            background-color: #c96868;
+            color: #ffffff;
+            padding: 12px 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -58,6 +249,118 @@
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        /* JavaScript (Logika Tombol & Simulasi) */
+        const btnConnect = document.getElementById('btnConnect');
+        const btnSimulasi = document.getElementById('btnSimulasi');
+        const btnSave = document.getElementById('btnSave');
+        const btnDownload = document.getElementById('btnDownload');
+        const statusBadge = document.getElementById('statusBadge');
+
+        const inputNama = document.getElementById('inputNama');
+        const inputHR = document.getElementById('inputHR');
+        const inputSuhu = document.getElementById('inputSuhu');
+        const tableBody = document.getElementById('tableBody');
+
+        let simInterval = null;
+        let dataRecords = [];
+
+        // 1. Fitur Mode Simulasi
+        btnSimulasi.addEventListener('click', () => {
+            if (simInterval) {
+                clearInterval(simInterval);
+                simInterval = null;
+                statusBadge.textContent = "Status: Terputus 🐾";
+                statusBadge.classList.remove('connected');
+                btnSimulasi.textContent = "🪄 Mode Simulasi";
+                inputHR.value = "";
+                inputSuhu.value = "";
+            } else {
+                statusBadge.textContent = "Status: Simulasi Aktif ✨";
+                statusBadge.classList.add('connected');
+                btnSimulasi.textContent = "⏹️ Stop Simulasi";
+                
+                const generateDummyData = () => {
+                    const randomHR = Math.floor(Math.random() * (100 - 65 + 1)) + 65;
+                    const randomSuhu = (Math.random() * (37.5 - 36.1) + 36.1).toFixed(1);
+                    inputHR.value = `${randomHR}`;
+                    inputSuhu.value = `${randomSuhu}`;
+                };
+                generateDummyData();
+                simInterval = setInterval(generateDummyData, 2000);
+            }
+        });
+
+        // 2. Fitur Connect Web Bluetooth (BLE)
+        btnConnect.addEventListener('click', async () => {
+            try {
+                statusBadge.textContent = "Status: Mencari perangkat... 🔍";
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['heart_rate', 'health_thermometer']
+                });
+
+                const server = await device.gatt.connect();
+                statusBadge.textContent = `Status: Terhubung (${device.name}) 💚`;
+                statusBadge.classList.add('connected');
+
+                device.addEventListener('gattserverdisconnected', () => {
+                    statusBadge.textContent = "Status: Terputus 🐾";
+                    statusBadge.classList.remove('connected');
+                });
+            } catch (error) {
+                console.error(error);
+                statusBadge.textContent = "Status: Gagal / Dibatalkan 🐾";
+                statusBadge.classList.remove('connected');
+            }
+        });
+
+        // 3. Fitur Simpan Data ke Tabel
+        btnSave.addEventListener('click', () => {
+            const nama = inputNama.value.trim();
+            const hr = inputHR.value.trim();
+            const suhu = inputSuhu.value.trim();
+
+            if (!nama) {
+                alert("Masukkan nama terlebih dahulu!");
+                return;
+            }
+            if (!hr || !suhu) {
+                alert("Data Heart Rate dan Suhu belum tersedia! Aktifkan BLE atau Mode Simulasi.");
+                return;
+            }
+
+            dataRecords.push({ nama, hr, suhu });
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${nama}</td>
+                <td>${hr}</td>
+                <td>${suhu}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // 4. Fitur Download CSV
+        btnDownload.addEventListener('click', () => {
+            if (dataRecords.length === 0) {
+                alert("Belum ada data untuk diunduh!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Nama,Heart Rate (bpm),Temperature (C)\n";
+            dataRecords.forEach(item => {
+                csvContent += `${item.nama},${item.hr},${item.suhu}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "data_health_tracker.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    </script>
 </body>
 </html>
